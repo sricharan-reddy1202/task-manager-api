@@ -1,8 +1,11 @@
 const express = require("express");
-
+const connectDB = require("./config/db");
+require("dotenv").config();
 const app = express();
 
-const PORT = 5000;
+connectDB();
+
+const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
     res.send("Task Manager API running");
