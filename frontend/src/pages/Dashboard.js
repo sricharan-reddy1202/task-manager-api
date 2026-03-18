@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTasks, createTask } from "../services/taskService";
+import { getTasks, createTask, deleteTask } from "../services/taskService";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -23,12 +23,22 @@ function Dashboard() {
 
     try {
       const newTask = await createTask({ title });
-
-      setTasks([newTask, ...tasks]); // update UI instantly
-      setTitle(""); // clear input
-
+      setTasks([newTask, ...tasks]);
+      setTitle("");
     } catch (error) {
       alert("Failed to create task");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteTask(id);
+
+      // remove from UI
+      setTasks(tasks.filter((task) => task._id !== id));
+
+    } catch (error) {
+      alert("Failed to delete task");
     }
   };
 
@@ -36,7 +46,7 @@ function Dashboard() {
     <div>
       <h2>Dashboard</h2>
 
-      {/* Create Task Form */}
+      {/* Create Task */}
       <form onSubmit={handleCreateTask}>
         <input
           type="text"
@@ -55,6 +65,10 @@ function Dashboard() {
           <div key={task._id}>
             <h4>{task.title}</h4>
             <p>Status: {task.status}</p>
+
+            <button onClick={() => handleDelete(task._id)}>
+              Delete
+            </button>
           </div>
         ))
       )}

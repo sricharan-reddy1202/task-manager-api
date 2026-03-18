@@ -24,3 +24,12 @@ export const createTask = async (taskData) => {
 
   return response.data;
 };
+export const deleteTask = async (taskId) => {
+  const token = localStorage.getItem("token");
+
+  await axios.delete(`${API_URL}/${taskId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
