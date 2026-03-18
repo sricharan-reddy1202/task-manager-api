@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getTasks, createTask, deleteTask,updateTask } from "../services/taskService";
+import {
+  getTasks,
+  createTask,
+  deleteTask,
+  updateTask
+} from "../services/taskService";
+
+import TaskCard from "../components/TaskCard";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -21,9 +28,17 @@ function Dashboard() {
   const handleCreateTask = async (e) => {
     e.preventDefault();
 
+    if (!title.trim()) {
+      alert("Task title cannot be empty");
+      return;
+    }
+
     try {
       const newTask = await createTask({ title });
-      setTasks([newTask, ...tasks]);
+
+      // add new task at top
+      setTasks((prevTasks) => [newTask, ...prevTasks]);
+
       setTitle("");
     } catch (error) {
       alert("Failed to create task");
@@ -34,39 +49,39 @@ function Dashboard() {
     try {
       await deleteTask(id);
 
-      // remove from UI
-      setTasks(tasks.filter((task) => task._id !== id));
-
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => task._id !== id)
+      );
     } catch (error) {
       alert("Failed to delete task");
     }
   };
+
   const handleUpdateStatus = async (id) => {
-  try {
-    const updatedTask = await updateTask(id, {
-      status: "completed"
-    });
+    try {
+      const updatedTask = await updateTask(id, {
+        status: "completed"
+      });
 
-    // update UI
-    setTasks(
-      tasks.map((task) =>
-        task._id === id ? updatedTask : task
-      )
-    );
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === id ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      alert("Failed to update task");
+    }
+  };
 
-  } catch (error) {
-    alert("Failed to update task");
-  }
-};
   return (
-    <div>
-      <h2>Dashboard</h2>
+    <div style={{ maxWidth: "600px", margin: "20px auto" }}>
+      <h2 style={{ textAlign: "center" }}>Dashboard</h2>
 
       {/* Create Task */}
       <form onSubmit={handleCreateTask}>
         <input
           type="text"
-          placeholder="Enter task title"
+          placeholder="Enter task"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -75,22 +90,15 @@ function Dashboard() {
 
       {/* Task List */}
       {tasks.length === 0 ? (
-        <p>No tasks found</p>
+        <p style={{ textAlign: "center" }}>No tasks found</p>
       ) : (
         tasks.map((task) => (
-          <div key={task._id}>
-            <h4>{task.title}</h4>
-            <p>Status: {task.status}</p>
-
-            <button onClick={() => handleDelete(task._id)}>
-              Delete
-            </button>
-            {task.status !== "completed" && (
-      <button onClick={() => handleUpdateStatus(task._id)}>
-        Mark as Completed
-      </button>
-    )}
-          </div>
+          <TaskCard
+            key={task._id}
+            task={task}
+            onDelete={handleDelete}
+            onComplete={handleUpdateStatus}
+          />
         ))
       )}
     </div>

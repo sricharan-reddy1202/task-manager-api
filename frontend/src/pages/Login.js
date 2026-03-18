@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
 
 function Login() {
+  const navigate = useNavigate(); 
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -20,12 +23,11 @@ function Login() {
     try {
       const data = await loginUser(formData);
 
-      // store token
       localStorage.setItem("token", data.token);
 
-      alert("Login successful");
+      navigate("/dashboard"); // redirect
 
-      console.log("TOKEN:", data.token);
+      alert("Login successful");
 
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
@@ -33,28 +35,18 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Login</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} />
         <button type="submit">Login</button>
       </form>
+
+      <p>
+        Don't have an account? <a href="/register">Register</a>
+      </p>
     </div>
   );
 }

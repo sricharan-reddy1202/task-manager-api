@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { registerUser } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate(); 
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,45 +22,25 @@ function Register() {
     e.preventDefault();
 
     try {
-      const data = await registerUser(formData);
-      console.log(data);
-      alert("User registered successfully");
-    } catch (error) {
-      console.log("ERROR:", error);
-      console.log("RESPONSE:", error.response);
+      await registerUser(formData);
 
-  alert(error.response?.data?.message || error.message);
+      alert("User registered successfully");
+
+      navigate("/login"); // ✅ redirect after register
+
+    } catch (error) {
+      alert(error.response?.data?.message || error.message);
     }
   };
 
   return (
-    <div>
+    <div className="container"> {/* ✅ className instead of class */}
       <h2>Register</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter password"
-          value={formData.password}
-          onChange={handleChange}
-        />
+        <input type="text" name="name" placeholder="Enter name" value={formData.name} onChange={handleChange} />
+        <input type="email" name="email" placeholder="Enter email" value={formData.email} onChange={handleChange} />
+        <input type="password" name="password" placeholder="Enter password" value={formData.password} onChange={handleChange} />
 
         <button type="submit">Register</button>
       </form>
