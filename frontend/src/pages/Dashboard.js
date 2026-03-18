@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTasks, createTask, deleteTask } from "../services/taskService";
+import { getTasks, createTask, deleteTask,updateTask } from "../services/taskService";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -41,7 +41,23 @@ function Dashboard() {
       alert("Failed to delete task");
     }
   };
+  const handleUpdateStatus = async (id) => {
+  try {
+    const updatedTask = await updateTask(id, {
+      status: "completed"
+    });
 
+    // update UI
+    setTasks(
+      tasks.map((task) =>
+        task._id === id ? updatedTask : task
+      )
+    );
+
+  } catch (error) {
+    alert("Failed to update task");
+  }
+};
   return (
     <div>
       <h2>Dashboard</h2>
@@ -69,6 +85,11 @@ function Dashboard() {
             <button onClick={() => handleDelete(task._id)}>
               Delete
             </button>
+            {task.status !== "completed" && (
+      <button onClick={() => handleUpdateStatus(task._id)}>
+        Mark as Completed
+      </button>
+    )}
           </div>
         ))
       )}

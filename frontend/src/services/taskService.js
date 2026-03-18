@@ -33,3 +33,18 @@ export const deleteTask = async (taskId) => {
     }
   });
 };
+export const updateTask = async (taskId, updatedData) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.put(
+    `${API_URL}/${taskId}`,
+    updatedData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+};
